@@ -8,11 +8,8 @@
 #include "../../include/common_args.h"
 
 #include "common.h"
-
-//#define USEGPU 1
 int BLOCK_SIZE = 16;
 static int do_verify = 0;
-
 
 static struct option long_options[] = {
 	/* name, has_arg, flag, val */
@@ -112,18 +109,11 @@ main ( int argc, char *argv[] )
 	while(BLOCK_SIZE*BLOCK_SIZE>max_worksize[0])
 		BLOCK_SIZE = BLOCK_SIZE/2;
 
-	kernelFile = fopen("lud_kernel.cl", "r");
-	fseek(kernelFile, 0, SEEK_END);
-	kernelLength = (size_t) ftell(kernelFile);
-	kernelSource = (char *) malloc(sizeof(char)*kernelLength);
-	rewind(kernelFile);
-	fread((void *) kernelSource, kernelLength, 1, kernelFile);
-	fclose(kernelFile);
-
-	clProgram = clCreateProgramWithSource(context, 1, (const char **) &kernelSource, &kernelLength, &errcode);
-	CHKERR(errcode, "Failed to create program with source!");
-
-	free(kernelSource);
+	if(_deviceType == 3) //USE_AFPGA
+		clProgram = ocdBuildProgramFromFile(context,device_id,"lud_kernel.aocx");
+	else //CPU or GPU or MIC
+		clProgram = ocdBuildProgramFromFile(context,device_id,"lud_kernel.cl");
+	
 	char arg[100];
 	sprintf(arg,"-D BLOCK_SIZE=%d", (int)BLOCK_SIZE);
 	errcode = clBuildProgram(clProgram, 1, &device_id, arg, NULL, NULL);
