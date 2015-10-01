@@ -69,6 +69,13 @@ To see a full list of options and applications:
 
     $ ../configure --help
 
+Building for Altera devices (Quartus 13.1)
+-------
+You have to ensure that LD_LIBRARY_PATH and LIBRARY_PATH are set to /usr/local/altera/13.1/hld/linux64/lib (or any other Altera lib directory)
+For csr benchmark
+    $ ../configure --with-AOCL=/usr/local/altera/13.1/hld --with-apps=csr
+    $ make AM_CPPFLAGS="" LIBS="-lalteracl -lalterahalmmd -lalterammdpcie -lelf -lrt -lstdc++"
+
 Running
 -------
 
