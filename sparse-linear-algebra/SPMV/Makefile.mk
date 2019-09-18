@@ -14,7 +14,7 @@ createcsr_SOURCES = sparse-linear-algebra/SPMV/src-test/createcsr.c sparse-linea
 
 ##createcsr does not need to be linked with any of the opencl common files
 createcsr_LDADD = include/common_args.o include/rdtsc.o opts/opts.o
-createcsr_LINK = $(CCLD) -lm -o $@
+createcsr_LINK = $(CCLD) -o $@ -lm
 
 all_local += csr-all-local
 exec_local += csr-exec-local
