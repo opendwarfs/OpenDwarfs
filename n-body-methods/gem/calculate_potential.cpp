@@ -19,6 +19,8 @@
 
 #include "calculations.h"
 #include "defines.h"
+#undef min
+#undef max
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -34,7 +36,7 @@
 
 #ifdef __FPGA__
     #include "cl_ext.h"
-#else 
+#else
     #define CL_MEM_BANK_1_ALTERA              (0)
     #define CL_MEM_BANK_2_ALTERA              (0)
     #define CL_MEM_BANK_3_ALTERA              (0)
@@ -152,7 +154,7 @@ void calc_potential_single_step(residue *residues,
 /*	const char * filename  = "calculate_potential.cl";
 	std::string  sourceStr = convertToString(filename);
 	const char * source    = sourceStr.c_str();
-	size_t sourceSize[]    
+	size_t sourceSize[]
 = { strlen(source) };
 
 	program = clCreateProgramWithSource(
@@ -178,11 +180,11 @@ void calc_potential_single_step(residue *residues,
     std::string kernel_file_name;
 	kernel_files = (char*) malloc(sizeof(char*)*num_kernels);
     kernel_file_name = "calculate_potential";
-			
-	
+
+
     kernel_files = new char[kernel_file_name.length()+1];
     strcpy(kernel_files,kernel_file_name.c_str());
-		
+
     cl_program program = ocdBuildProgramFromFile(context,device_id,kernel_files, NULL);
 
 	if(status != CL_SUCCESS)
@@ -190,7 +192,7 @@ void calc_potential_single_step(residue *residues,
 		std::cout<<"Error: Building Program (clBuildProgram):"<<status<<std::endl;
 		char * errorbuf = (char*)calloc(sizeof(char),1024*1024);
 		size_t size;
-		clGetProgramBuildInfo(program, 
+		clGetProgramBuildInfo(program,
 				device_id,
 				CL_PROGRAM_BUILD_LOG,
 				1024*1024,
@@ -199,7 +201,7 @@ void calc_potential_single_step(residue *residues,
 
 		std::cout << errorbuf << std::endl;
 		exit(-1);
-	} 
+	}
 
 	/* get a kernel object handle for a kernel with the given name */
 	kernel = clCreateKernel(program, "calc_potential_single_step_dev", &status);
@@ -473,8 +475,8 @@ void calc_potential_single_step(residue *residues,
 
 	size_t maxWorkItemSizes[3];
 	clGetDeviceInfo(
-			device_id, 
-			CL_DEVICE_MAX_WORK_ITEM_SIZES, 
+			device_id,
+			CL_DEVICE_MAX_WORK_ITEM_SIZES,
 			sizeof(size_t)*3,
 			(void*)maxWorkItemSizes,
 			NULL);
@@ -492,22 +494,22 @@ void calc_potential_single_step(residue *residues,
 
 
 	clGetDeviceInfo(
-			device_id, 
-			CL_DEVICE_MAX_WORK_GROUP_SIZE, 
-			sizeof(size_t), 
-			(void*)&maxWorkGroupSize, 
+			device_id,
+			CL_DEVICE_MAX_WORK_GROUP_SIZE,
+			sizeof(size_t),
+			(void*)&maxWorkGroupSize,
 			NULL);
 
 
 	clGetDeviceInfo(
-			device_id, 
-			CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, 
-			sizeof(cl_uint), 
-			(void*)&maxDims, 
+			device_id,
+			CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS,
+			sizeof(cl_uint),
+			(void*)&maxDims,
 			NULL);
 
 
-	if(globalThreads[0] > maxWorkGroupSize || 
+	if(globalThreads[0] > maxWorkGroupSize ||
 			localThreads[0] > maxWorkItemSizes[0])
 	{
 		std::cout<<"Unsupported: Device does not support requested number of work items."<<std::endl;
@@ -533,8 +535,8 @@ void calc_potential_single_step(residue *residues,
 				0,
 				NULL,
 				&ocdTempEvent);
-		if(status != CL_SUCCESS) 
-		{ 
+		if(status != CL_SUCCESS)
+		{
 			std::cout<<
 				"Error: Enqueueing kernel onto command queue. \
 				(clEnqueueNDRangeKernel): "<< status << std::endl;
@@ -545,8 +547,8 @@ void calc_potential_single_step(residue *residues,
 		status = clWaitForEvents(1, &ocdTempEvent);
 		START_TIMER(ocdTempEvent, OCD_TIMER_KERNEL, "GEM Kernel", ocdTempTimer)
 		END_TIMER(ocdTempTimer)
-		if(status != CL_SUCCESS) 
-		{ 
+		if(status != CL_SUCCESS)
+		{
 				std::cout<<
 					"Error: Waiting for kernel run to finish. \
 					(clWaitForEvents)\n";
@@ -573,9 +575,9 @@ void calc_potential_single_step(residue *residues,
 			NULL,
 			&ocdTempEvent);
 	clFinish(commands);
-	if(status != CL_SUCCESS) 
-	{ 
-		std::cout << 
+	if(status != CL_SUCCESS)
+	{
+		std::cout <<
 			"Error: clEnqueueReadBuffer failed. \
 			(clEnqueueReadBuffer)\n";
 
@@ -586,8 +588,8 @@ void calc_potential_single_step(residue *residues,
 	status = clWaitForEvents(1, &ocdTempEvent);
 	START_TIMER(ocdTempEvent, OCD_TIMER_D2H, "Vertex Copy", ocdTempTimer)
 	END_TIMER(ocdTempTimer)
-	if(status != CL_SUCCESS) 
-	{ 
+	if(status != CL_SUCCESS)
+	{
 			std::cout<<
 				"Error: Waiting for read buffer call to finish. \
 				(clWaitForEvents)\n";
